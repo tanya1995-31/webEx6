@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch API</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <script>
+        const url = "https://dummyjson.com/docs/products";
+        
+        let currentPage = 1;
+        const productsPerPage = 10;
+        let data;
+
+        const createCell = (value, isHead) => {
+            return $(isHead ? '<th/>' : '<td/>').addClass("border border-gray-300 p-2 truncate text-wrap").text(value);
+        }
+
+        const createRow = (values, isHead) => {
+            return $('<tr/>').append(values.map(value => createCell(value, isHead)));
+        }
+
+        const createTable = (data, startIndex, endIndex) => {
+            const table = $('<table/>').addClass("border border-gray-300 w-full");
+            table.append(createRow(["ID", "Title", "Description"], true));
+            data.forEach(asset => {
+                table.append(createRow([asset.id, asset.title, asset.description]));
+            });
+            return table;
+        }
+
+        const updateTable = () => {
+            const startIndex = (currentPage - 1) * productsPerPage;
+            const endIndex = startIndex + productsPerPage;
+            const productsToShow = data.products.slice(startIndex, endIndex);
+            $('#myTable').empty().append(createTable(productsToShow));
+        }
+
+        $(document).ready(function () {
+            fetch("https://dummyjson.com/products")
+                .then(response => response.json())
+                .then((responseData) => {
+                    data = responseData;
+                    updateTable();
+                });
+
+            $("#prevBtn").click(() => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    updateTable();
+                }
+            });
+
+            $("#nextBtn").click(() => {
+                const totalPages = Math.ceil(data.products.length / productsPerPage);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    updateTable();
+                }
+            });
+        });
+
+    </script>
+</head>
+<body>
+<div class="w-[1000px] mx-auto border border-gray-300 p-4 m-4">
+    <h1 class="text-2xl font-bold text-center">EX-6</h1>
+    <div id="myTable"></div>
+    <div class="flex justify-between mt-4">
+        <button id="prevBtn" class="bg-yellow-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-l">
+            Previous
+        </button>
+        <button id="nextBtn" class="bg-yellow-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r">
+            Next
+        </button>
+    </div>
+</div>
+<script>
+  // custom config for the MTW app 
+  const mtwAppConfig = {
+      border: true // app border in the MTW page                    
+  }
+
+  ///////////////////////////////////////////////////////
+  // implement this functions in order to use private API        
+  const sendPrivateApiRequest = async () => {
+      // your code here:
+      // sendRequestToParent({ cat: 'getAssets' })
+  }        
+
+  const acceptPrivateApiResponse = async (data) => {
+      // process received data here:
+      // console.log(data)
+  }
+
+  // use this in order to send on document load
+  document.addEventListener('DOMContentLoaded', () => {
+      // your code here:
+      //sendRequestToParent({ method: 'getAssets' })
+  })
+
+</script>
+<script src="https://morethanwallet.com/appstore/index.js"></script>
+</body>
+</html>
